@@ -8,7 +8,7 @@ import jwt from "jsonwebtoken";
 const generateAccessAndRefreshTokens = async (userId) => {
   try {
     const user = await User.findById(userId);
-    const accessToken = user.generatAccessToken();
+    const accessToken = user.generateAccessToken();
     const refreshToken = user.generateRefreshToken();
 
     user.refreshToken = refreshToken;
@@ -87,7 +87,7 @@ const loginUser = asyncHandler(async (req, res) => {
     throw new ApiError(400, "username or email is required");
   }
 
-  const user = User.findOne({
+  const user = await User.findOne({
     $or: [{ username }, { email }],
   });
 
