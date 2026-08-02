@@ -230,12 +230,24 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
 
   if (!fullName || !email) throw new ApiError(400, "All fields are required");
 
+  const cleanEmail = email.toLowerCase().trim();
+
+  // Prevent email duplication errors
+  const emailExists = await User.findOne({ 
+    email: cleanEmail, 
+    _id: { $ne: req.user?._id } 
+  });
+  
+  if (emailExists) {
+    throw new ApiError(400, "Email is already taken");
+  }
+
   const user = await User.findByIdAndUpdate(
     req.user?._id,
     {
       $set: {
-        fullName,
-        email,
+        fullName: fullName.trim(),
+        email: cleanEmail,
       },
     },
     { new: true }
